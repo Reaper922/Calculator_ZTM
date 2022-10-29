@@ -2,6 +2,14 @@ const calculatorDisplay = document.querySelector('h1');
 const inputBtns = document.querySelectorAll('button');
 const clearBtn = document.getElementById('clear-btn');
 
+const calculate = {
+    '/': (firstNumber, secondNumber) => firstNumber / secondNumber,
+    '*': (firstNumber, secondNumber) => firstNumber * secondNumber,
+    '+': (firstNumber, secondNumber) => firstNumber + secondNumber,
+    '-': (firstNumber, secondNumber) => firstNumber - secondNumber,
+    '=': (firstNumber, secondNumber) => secondNumber,
+}
+
 let firstValue = 0;
 let operatorValue = '';
 let awaitingNextValue = false;
@@ -17,6 +25,7 @@ function sendNumberValue(number) {
     }
 }
 
+
 function addDecimal() {
     if (awaitingNextValue) return;
 
@@ -25,22 +34,35 @@ function addDecimal() {
     }
 }
 
+
 function useOperator(operator) {
     const currentValue = Number(calculatorDisplay.textContent);
 
-    if (operatorValue && awaitingNextValue) return;
+    if (operatorValue && awaitingNextValue) {
+        operatorValue = operator;
+        return;
+    }
 
     if (!firstValue) {
         firstValue = currentValue;
     } else {
-        console.log('currentValue', currentValue);
+        const calculation = calculate[operatorValue](firstValue, currentValue);
+        calculatorDisplay.textContent = calculation;
+        firstValue = calculation;
     }
 
     awaitingNextValue = true;
     operatorValue = operator;
-    console.log('firstValue', firstValue);
-    console.log('operator', operatorValue);
 }
+
+
+function resetAll() {
+    calculatorDisplay.textContent = '0';
+    firstValue = 0;
+    operatorValue = '';
+    awaitingNextValue = false;
+}
+
 
 inputBtns.forEach((button => {
     if (button.classList.length === 0) {
@@ -51,13 +73,5 @@ inputBtns.forEach((button => {
         button.addEventListener('click', addDecimal);
     }
 }))
-
-
-function resetAll() {
-    calculatorDisplay.textContent = '0';
-    firstValue = 0;
-    operatorValue = '';
-    awaitingNextValue = false;
-}
 
 clearBtn.addEventListener('click', resetAll);
